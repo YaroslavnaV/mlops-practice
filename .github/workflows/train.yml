@@ -28,7 +28,7 @@ jobs:
           node-version: '18'  # Используем LTS версию
 
       - name: Setup CML
-        uses: iterative/setup-cml@v2
+        uses: iterative/setup-cml@v3
 
       - name: Установка зависимостей
         run: pip install -r requirements.txt
