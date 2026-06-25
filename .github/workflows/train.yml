@@ -23,9 +23,12 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      # Установка CML через pip (без Node.js)
-      - name: Install CML (Python version)
-        run: pip install cml
+      # Скачиваем готовый бинарник CML (без Node.js и pip!)
+      - name: Install CML
+        run: |
+          curl -L https://github.com/iterative/cml/releases/download/v0.18.2/cml-linux-x64 -o /usr/local/bin/cml
+          chmod +x /usr/local/bin/cml
+          cml --version
 
       - name: Установка зависимостей
         run: pip install -r requirements.txt
