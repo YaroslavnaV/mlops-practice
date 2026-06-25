@@ -49,9 +49,14 @@ jobs:
           echo "## Результаты эксперимента" > report.md
           
           echo "### Изменения параметров:" >> report.md
-          dvc params diff main --md >> report.md
-          
+          dvc params diff main --md >> report.md || echo "_Нет изменений параметров_" >> report.md
+    
           echo "### Изменения метрик:" >> report.md
-          dvc metrics diff main --md >> report.md
+          dvc metrics diff main --md >> report.md || echo "_Нет изменений метрик_" >> report.md
+    
+          # Показываем содержимое отчета в логах (для отладки)
+          cat report.md
+    
+          # Отправка отчета в Pull Request
+          cml comment create report.md
           
-          cml comment report.md
