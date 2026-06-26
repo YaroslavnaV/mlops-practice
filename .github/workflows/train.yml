@@ -1,12 +1,13 @@
-name: Train and Report (CML)
+name: Train and Report
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 permissions:
   pull-requests: write
   contents: read
+  issues: write
 
 jobs:
   run-experiment:
@@ -23,9 +24,6 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: Setup CML
-        uses: iterative/setup-cml@v2
-
       - name: Установка зависимостей
         run: pip install -r requirements.txt
 
@@ -38,17 +36,20 @@ jobs:
       - name: Воспроизведение пайплайна (обучение)
         run: dvc repro
 
-      - name: Создание отчета CML
+      - name: Создание отчета
         env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "## Результаты эксперимента" > report.md
+          echo "## 📊 Результаты эксперимента" > report.md
           
-          echo "### Изменения параметров:" >> report.md
-          dvc params diff main --md >> report.md
-          
-          echo "### Изменения метрик:" >> report.md
-          dvc metrics diff main --md >> report.md
-          
-          # Отправка отчета в Pull Request
-          cml comment report.md
+          echo "### 🔧 Изменения параметров:" >> report.md
+          dvc params diff main --md >> report.md || echo "_Нет изменений параметров_" >> report.md
+    
+          echo "### 📈 Изменения метрик:" >> report.md
+          dvc metrics diff main --md >> report.md || echo "_Нет изменений метрик_" >> report.md
+    
+          # Показываем содержимое отчета в логах (для отладки)
+          cat report.md
+    
+          # Отправка отчета в Pull Request через GitHub CLI (gh)
+          gh pr comment ${{ github.event.pull_request.number }} --body-file report.md
